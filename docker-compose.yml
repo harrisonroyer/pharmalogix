@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  pharmalogix:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
+      - PORT=8000
+    volumes:
+      - ./data:/app/uploads
+      - ./db:/app/data
+    restart: unless-stopped
