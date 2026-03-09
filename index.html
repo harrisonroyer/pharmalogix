@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaLogix - Pharmaceutical Logistics AI Copilot</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a1628;
+            color: #ffffff;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #0f1f2f;
+            border-right: 1px solid #1e3a5f;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .nav-items {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: #9ca3af;
+            border: none;
+            font-size: 16px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover {
+            background: #1e3a5f;
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .company-info {
+            border-top: 1px solid #1e3a5f;
+            padding-top: 16px;
+            margin-bottom: 16px;
+        }
+
+        .company-name {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .logout-btn {
+            padding: 12px 16px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #991b1b;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0a1628;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a1628 0%, #1e3a5f 100%);
+        }
+
+        .auth-card {
+            background: #1e3a5f;
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e5e7eb;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: #0f1f2f;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .auth-link a {
+            color: #2563eb;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #7f1d1d;
+            color: #fecaca;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 4px solid #dc2626;
+        }
+
+        /* Chat View */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 16px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #1e3a5f;
+        }
+
+        .chat-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .clear-history-btn {
+            padding: 8px 16px;
+            background: #1e3a5f;
+            color: #9ca3af;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .clear-history-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .message.user .message-bubble {
+            background: #2563eb;
+            color: white;
+        }
+
+        .message.assistant .message-bubble {
+            background: #1e3a5f;
+            color: #e5e7eb;
+            border: 1px solid #2563eb;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6b7280;
+            padding: 40px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .message-input-area {
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: #1e3a5f;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 14px;
+            resize: none;
+            max-height: 100px;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .send-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .send-btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Data View */
+        .data-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #2563eb;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #1e3a5f;
+        }
+
+        .upload-zone:hover {
+            border-color: #60a5fa;
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .upload-zone.dragover {
+            border-color: #60a5fa;
+            background: rgba(37, 99, 235, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #e5e7eb;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            background: #1e3a5f;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #2563eb;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .file-meta {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .delete-btn {
+            padding: 8px 12px;
+            background: #7f1d1d;
+            color: #fecaca;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #991b1b;
+        }
+
+        /* Settings View */
+        .settings-container {
+            max-width: 600px;
+        }
+
+        .settings-section {
+            background: #1e3a5f;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid #2563eb;
+        }
+
+        .settings-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #e5e7eb;
+        }
+
+        .api-key-display {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .api-key-value {
+            flex: 1;
+            padding: 12px;
+            background: #0f1f2f;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 12px;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #0f1f2f;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #1e3a5f;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* API Docs View */
+        .docs-container {
+            max-width: 700px;
+        }
+
+        .docs-section {
+            background: #1e3a5f;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid #2563eb;
+        }
+
+        .docs-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #2563eb;
+        }
+
+        .docs-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            color: #e5e7eb;
+        }
+
+        .code-block {
+            background: #0f1f2f;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            border: 1px solid #2563eb;
+            color: #60a5fa;
+            margin-top: 8px;
+        }
+
+        .docs-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #9ca3af;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 6px;
+            background: #1e3a5f;
+            border-left: 4px solid #2563eb;
+            color: white;
+            font-size: 14px;
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.error {
+            border-left-color: #dc2626;
+            background: #7f1d1d;
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+            background: #065f46;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #2563eb;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Data Tables and Charts */
+        .data-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        .data-table th { background: #2563eb; color: white; padding: 8px 12px; text-align: left; }
+        .data-table td { padding: 7px 12px; border-bottom: 1px solid #1e3a5f; color: #e2e8f0; }
+        .data-table tr:nth-child(even) td { background: rgba(37,99,235,0.08); }
+        .table-wrapper { margin: 10px 0; overflow-x: auto; border-radius: 8px; }
+        .export-btn { background: #16a34a; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 8px; display: block; }
+        .export-btn:hover { background: #15803d; }
+        .chart-container { background: #1a2f4e; border-radius: 10px; padding: 16px; margin: 12px 0; }
+        .chart-title { color: #93c5fd; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                padding: 12px;
+                border-bottom: 1px solid #1e3a5f;
+                border-right: none;
+            }
+
+            .nav-items {
+                flex-direction: row;
+                gap: 4px;
+                flex: 1;
+            }
+
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .company-info {
+                display: none;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        function exportTableToCSV(btn) {
+            const table = btn.nextElementSibling;
+            const rows = Array.from(table.querySelectorAll('tr'));
+            const csv = rows.map(row =>
+                Array.from(row.querySelectorAll('th,td'))
+                    .map(cell => '"' + cell.textContent.replace(/"/g, '""') + '"')
+                    .join(',')
+            ).join('\n');
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'pharmalogix-data.csv'; a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function parseAndRenderCharts(container) {
+            if (!container) return;
+            const chartBlocks = container.querySelectorAll('.chart-block');
+            chartBlocks.forEach(block => {
+                if (block.querySelector('canvas')) return;
+                const type = block.dataset.type || 'bar';
+                const title = block.dataset.title || 'Chart';
+                const labels = block.dataset.labels ? block.dataset.labels.split(',').map(s => s.trim()) : [];
+                const datasetsRaw = block.dataset.datasets ? JSON.parse(block.dataset.datasets) : [];
+                const colors = ['#2563eb','#16a34a','#dc2626','#d97706','#7c3aed','#0891b2'];
+                const datasets = datasetsRaw.map((ds, i) => ({
+                    label: ds.name,
+                    data: ds.values,
+                    backgroundColor: type === 'pie' ? colors : colors[i % colors.length] + '99',
+                    borderColor: colors[i % colors.length],
+                    borderWidth: 2,
+                    tension: 0.4
+                }));
+                const canvas = document.createElement('canvas');
+                canvas.style.maxHeight = '300px';
+                block.appendChild(canvas);
+                new Chart(canvas, {
+                    type: type,
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { labels: { color: '#e2e8f0' } }, title: { display: true, text: title, color: '#93c5fd', font: { size: 14 } } },
+                        scales: type === 'pie' ? {} : { x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e3a5f' } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e3a5f' } } }
+                    }
+                });
+            });
+        }
+
+        function formatMessage(text) {
+            // Parse CHART blocks first
+            text = text.replace(/\[CHART:(bar|line|pie)\]\n([\s\S]*?)\[\/CHART\]/gi, (match, type, content) => {
+                const lines = content.trim().split('\n');
+                let title = 'Chart', labels = [], datasets = [];
+                lines.forEach(line => {
+                    if (line.startsWith('Title:')) title = line.replace('Title:', '').trim();
+                    else if (line.startsWith('Labels:')) labels = line.replace('Labels:', '').trim().split(',').map(s => s.trim());
+                    else if (line.startsWith('Dataset:')) {
+                        const parts = line.replace('Dataset:', '').trim().split('|');
+                        if (parts.length === 2) {
+                            datasets.push({ name: parts[0].trim(), values: parts[1].trim().split(',').map(s => parseFloat(s.trim()) || 0) });
+                        }
+                    }
+                });
+                const datasetsJson = JSON.stringify(datasets).replace(/"/g, '&quot;');
+                const labelsStr = labels.join(',');
+                return `<div class="chart-container"><div class="chart-title">📊 ${title}</div><div class="chart-block" data-type="${type}" data-title="${title}" data-labels="${labelsStr}" data-datasets="${datasetsJson}"></div></div>`;
+            });
+
+            // Parse markdown tables
+            const tableRegex = /(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g;
+            text = text.replace(tableRegex, (match) => {
+                const rows = match.trim().split('\n').filter(r => !r.match(/^\|[-| :]+\|$/));
+                if (rows.length < 2) return match;
+                const headers = rows[0].split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+                const bodyRows = rows.slice(1).map(row => {
+                    const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+                    return `<tr>${cells}</tr>`;
+                }).join('');
+                return `<div class="table-wrapper"><button class="export-btn" onclick="exportTableToCSV(this)">📥 Export to Excel</button><table class="data-table"><thead><tr>${headers}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+            });
+
+            // Existing formatting
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/`([^`]+)`/g, '<code style="background:#1e3a5f;padding:2px 6px;border-radius:4px;font-family:monospace;">$1</code>');
+            text = text.replace(/^### (.+)$/gm, '<h4 style="color:#93c5fd;margin:12px 0 6px;">$1</h4>');
+            text = text.replace(/^## (.+)$/gm, '<h3 style="color:#60a5fa;margin:14px 0 8px;">$1</h3>');
+            text = text.replace(/^# (.+)$/gm, '<h2 style="color:#93c5fd;margin:16px 0 8px;">$1</h2>');
+            text = text.replace(/^\* (.+)$/gm, '<li style="margin:3px 0;margin-left:16px;">$1</li>');
+            text = text.replace(/^\d+\. (.+)$/gm, '<li style="margin:3px 0;margin-left:16px;">$1</li>');
+            text = text.replace(/\n/g, '<br>');
+            return text;
+        }
+
+        function PharmaLogixApp() {
+            const [view, setView] = useState('login');
+            const [token, setToken] = useState(null);
+            const [company, setCompany] = useState(null);
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
+
+            // Login/Register form states
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [companyName, setCompanyName] = useState('');
+            const [isRegistering, setIsRegistering] = useState(false);
+            const [loading, setLoading] = useState(false);
+
+            // Chat states
+            const [messages, setMessages] = useState([]);
+            const [messageInput, setMessageInput] = useState('');
+            const [chatLoading, setChatLoading] = useState(false);
+            const messagesEndRef = useRef(null);
+
+            // Data upload states
+            const [files, setFiles] = useState([]);
+            const [uploadLoading, setUploadLoading] = useState(false);
+            const fileInputRef = useRef(null);
+            const dropZoneRef = useRef(null);
+
+            // Settings states
+            const [settingsName, setSettingsName] = useState('');
+            const [n8nWebhook, setN8nWebhook] = useState('');
+            const [stats, setStats] = useState({ files: 0, messages: 0, data_rows: 0 });
+            const [apiKeyRevealed, setApiKeyRevealed] = useState(false);
+            const [showApiKey, setShowApiKey] = useState(false);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const showToast = (message, type = 'error') => {
+                if (type === 'error') setError(message);
+                else setSuccess(message);
+                setTimeout(() => {
+                    setError('');
+                    setSuccess('');
+                }, 5000);
+            };
+
+            const apiCall = async (endpoint, method = 'GET', body = null) => {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                if (token) {
+                    options.headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                try {
+                    const response = await fetch(endpoint, options);
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.detail || `HTTP ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (err) {
+                    throw err;
+                }
+            };
+
+            const handleLogin = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                try {
+                    const result = await apiCall('/api/auth/login', 'POST', { email, password });
+                    setToken(result.token);
+                    setCompany(result);
+                    setView('chat');
+                    setEmail('');
+                    setPassword('');
+                    showToast('Logged in successfully!', 'success');
+                } catch (err) {
+                    showToast(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleRegister = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                try {
+                    const result = await apiCall('/api/auth/register', 'POST', {
+                        company_name: companyName,
+                        email,
+                        password
+                    });
+                    setToken(result.token);
+                    setCompany(result);
+                    setView('chat');
+                    setCompanyName('');
+                    setEmail('');
+                    setPassword('');
+                    showToast('Account created successfully!', 'success');
+                } catch (err) {
+                    showToast(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleLogout = () => {
+                setToken(null);
+                setCompany(null);
+                setView('login');
+                setMessages([]);
+                setFiles([]);
+                setError('');
+                setSuccess('');
+            };
+
+            const handleSendMessage = async (e) => {
+                e.preventDefault();
+                if (!messageInput.trim()) return;
+
+                const userMessage = messageInput.trim();
+                setMessages([...messages, { role: 'user', content: userMessage }]);
+                setMessageInput('');
+                setChatLoading(true);
+
+                try {
+                    const result = await apiCall('/api/chat', 'POST', { message: userMessage });
+                    setMessages(prev => [...prev, { role: 'assistant', content: result.response }]);
+                    showToast(`Response received (${result.usage} tokens)`, 'success');
+                } catch (err) {
+                    showToast(err.message);
+                } finally {
+                    setChatLoading(false);
+                }
+            };
+
+            const handleFileUpload = async (file) => {
+                if (!file) return;
+
+                const allowed = ['.csv', '.xlsx', '.xls'];
+                const ext = '.' + file.name.split('.').pop().toLowerCase();
+
+                if (!allowed.includes(ext)) {
+                    showToast(`File type ${ext} not supported. Use CSV or Excel.`);
+                    return;
+                }
+
+                setUploadLoading(true);
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    const options = {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    };
+
+                    const response = await fetch('/api/files/upload', options);
+                    if (!response.ok) throw new Error('Upload failed');
+
+                    const result = await response.json();
+                    setFiles([result, ...files]);
+                    showToast('File uploaded successfully!', 'success');
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                } catch (err) {
+                    showToast(err.message);
+                } finally {
+                    setUploadLoading(false);
+                }
+            };
+
+            const handleDeleteFile = async (fileId) => {
+                try {
+                    await apiCall(`/api/files/${fileId}`, 'DELETE');
+                    setFiles(files.filter(f => f.id !== fileId));
+                    showToast('File deleted', 'success');
+                } catch (err) {
+                    showToast(err.message);
+                }
+            };
+
+            const loadFiles = async () => {
+                try {
+                    const result = await apiCall('/api/files');
+                    setFiles(result);
+                } catch (err) {
+                    showToast(err.message);
+                }
+            };
+
+            const clearChatHistory = async () => {
+                if (!confirm('Are you sure you want to clear chat history?')) return;
+                try {
+                    await apiCall('/api/chat/history', 'DELETE');
+                    setMessages([]);
+                    showToast('Chat history cleared', 'success');
+                } catch (err) {
+                    showToast(err.message);
+                }
+            };
+
+            const loadSettings = async () => {
+                try {
+                    const me = await apiCall('/api/auth/me');
+                    setCompany(me);
+                    setSettingsName(me.name);
+                    setN8nWebhook(me.n8n_webhook);
+
+                    const statsResult = await apiCall('/api/stats');
+                    setStats(statsResult);
+                } catch (err) {
+                    showToast(err.message);
+                }
+            };
+
+            const handleSaveSettings = async (e) => {
+                e.preventDefault();
+                try {
+                    await apiCall('/api/settings', 'PUT', {
+                        company_name: settingsName,
+                        n8n_webhook: n8nWebhook
+                    });
+                    const me = await apiCall('/api/auth/me');
+                    setCompany(me);
+                    showToast('Settings saved!', 'success');
+                } catch (err) {
+                    showToast(err.message);
+                }
+            };
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text);
+                showToast('Copied to clipboard!', 'success');
+            };
+
+            const handleDragOver = (e) => {
+                e.preventDefault();
+                dropZoneRef.current?.classList.add('dragover');
+            };
+
+            const handleDragLeave = () => {
+                dropZoneRef.current?.classList.remove('dragover');
+            };
+
+            const handleDrop = (e) => {
+                e.preventDefault();
+                dropZoneRef.current?.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            };
+
+            useEffect(() => {
+                if (view === 'data' && token) {
+                    loadFiles();
+                }
+            }, [view, token]);
+
+            useEffect(() => {
+                if (view === 'settings' && token) {
+                    loadSettings();
+                }
+            }, [view, token]);
+
+            useEffect(() => {
+                if (view === 'chat' && messages.length > 0) {
+                    const messagesContainer = document.querySelector('.messages');
+                    if (messagesContainer) {
+                        setTimeout(() => parseAndRenderCharts(messagesContainer), 100);
+                    }
+                }
+            }, [messages, view]);
+
+            // Login View
+            if (!token) {
+                return (
+                    <div className="auth-container">
+                        <div className="auth-card">
+                            <div className="auth-header">
+                                <div className="auth-logo">💊🚚</div>
+                                <h1 className="auth-title">PharmaLogix</h1>
+                                <p className="auth-subtitle">Pharmaceutical Logistics AI</p>
+                            </div>
+
+                            {error && <div className="error-message">{error}</div>}
+
+                            <form onSubmit={isRegistering ? handleRegister : handleLogin}>
+                                {isRegistering && (
+                                    <div className="form-group">
+                                        <label>Company Name</label>
+                                        <input
+                                            type="text"
+                                            value={companyName}
+                                            onChange={(e) => setCompanyName(e.target.value)}
+                                            required
+                                            placeholder="Your Company Inc."
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="form-group">
+                                    <label>Email</label>
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                        placeholder="hello@company.com"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Password</label>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+
+                                <button type="submit" className="submit-btn" disabled={loading}>
+                                    {loading ? <span className="spinner"></span> : (isRegistering ? 'Create Account' : 'Sign In')}
+                                </button>
+                            </form>
+
+                            <div className="auth-link">
+                                {isRegistering ? (
+                                    <>
+                                        Already have an account?{' '}
+                                        <a onClick={() => setIsRegistering(false)}>Sign In</a>
+                                    </>
+                                ) : (
+                                    <>
+                                        Don't have an account?{' '}
+                                        <a onClick={() => setIsRegistering(true)}>Create one</a>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {error && <div className="toast error">{error}</div>}
+                        {success && <div className="toast success">{success}</div>}
+                    </div>
+                );
+            }
+
+            // Main App View
+            return (
+                <div className="container">
+                    <div className="sidebar">
+                        <div className="logo">
+                            <span className="logo-icon">💊</span>
+                            <span>PharmaLogix</span>
+                        </div>
+
+                        <div className="nav-items">
+                            <button className={`nav-item ${view === 'chat' ? 'active' : ''}`} onClick={() => setView('chat')}>
+                                💬 Chat
+                            </button>
+                            <button className={`nav-item ${view === 'data' ? 'active' : ''}`} onClick={() => setView('data')}>
+                                📊 Data
+                            </button>
+                            <button className={`nav-item ${view === 'settings' ? 'active' : ''}`} onClick={() => setView('settings')}>
+                                ⚙️ Settings
+                            </button>
+                            <button className={`nav-item ${view === 'docs' ? 'active' : ''}`} onClick={() => setView('docs')}>
+                                🔌 API Docs
+                            </button>
+                        </div>
+
+                        <div className="company-info">
+                            <div className="company-name">{company?.name}</div>
+                        </div>
+
+                        <button className="logout-btn" onClick={handleLogout}>
+                            Logout
+                        </button>
+                    </div>
+
+                    <div className="main-content">
+                        <div className="content-area">
+                            {view === 'chat' && (
+                                <div className="chat-container">
+                                    <div className="chat-header">
+                                        <h2>Chat with PharmaLogix Copilot</h2>
+                                        <button className="clear-history-btn" onClick={clearChatHistory}>
+                                            Clear History
+                                        </button>
+                                    </div>
+
+                                    <div className="messages">
+                                        {messages.length === 0 ? (
+                                            <div className="empty-state">
+                                                <div className="empty-state-icon">💬</div>
+                                                <p>Welcome to PharmaLogix!</p>
+                                                <p>Start by uploading your logistics data, then ask questions about your supply chain.</p>
+                                            </div>
+                                        ) : (
+                                            messages.map((msg, idx) => (
+                                                <div key={idx} className={`message ${msg.role}`} ref={idx === messages.length - 1 ? messagesEndRef : null}>
+                                                    <div className="message-bubble" dangerouslySetInnerHTML={{__html: formatMessage(msg.content)}} />
+                                                </div>
+                                            ))
+                                        )}
+                                        {chatLoading && (
+                                            <div className="message assistant">
+                                                <div className="message-bubble">
+                                                    <span className="spinner"></span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div ref={messagesEndRef} />
+                                    </div>
+
+                                    <form onSubmit={handleSendMessage} className="message-input-area">
+                                        <textarea
+                                            className="message-input"
+                                            value={messageInput}
+                                            onChange={(e) => setMessageInput(e.target.value)}
+                                            placeholder="Ask about your logistics data, KPIs, compliance, or supply chain..."
+                                            rows="2"
+                                        />
+                                        <button type="submit" className="send-btn" disabled={chatLoading || !messageInput.trim()}>
+                                            Send
+                                        </button>
+                                    </form>
+                                </div>
+                            )}
+
+                            {view === 'data' && (
+                                <div className="data-container">
+                                    <div>
+                                        <h2 style={{ marginBottom: '16px' }}>Upload Logistics Data</h2>
+                                        <div
+                                            ref={dropZoneRef}
+                                            className="upload-zone"
+                                            onDragOver={handleDragOver}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={handleDrop}
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <div className="upload-icon">📂</div>
+                                            <p className="upload-text">Drag and drop your file here or click to browse</p>
+                                            <p className="upload-subtext">Supports CSV and Excel files (.xlsx, .xls)</p>
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                className="file-input"
+                                                accept=".csv,.xlsx,.xls"
+                                                onChange={(e) => {
+                                                    if (e.target.files?.[0]) {
+                                                        handleFileUpload(e.target.files[0]);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {uploadLoading && (
+                                        <div style={{ textAlign: 'center', padding: '20px' }}>
+                                            <span className="spinner"></span> Uploading...
+                                        </div>
+                                    )}
+
+                                    {files.length > 0 && (
+                                        <div>
+                                            <h3 style={{ marginBottom: '12px' }}>Uploaded Files ({files.length})</h3>
+                                            <div className="files-list">
+                                                {files.map(file => (
+                                                    <div key={file.id} className="file-item">
+                                                        <div className="file-info">
+                                                            <div className="file-icon">📄</div>
+                                                            <div className="file-details">
+                                                                <div className="file-name">{file.name}</div>
+                                                                <div className="file-meta">
+                                                                    {file.rows} rows • {new Date(file.uploaded_at).toLocaleDateString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            className="delete-btn"
+                                                            onClick={() => handleDeleteFile(file.id)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {view === 'settings' && (
+                                <div className="settings-container">
+                                    <h2 style={{ marginBottom: '24px' }}>Settings</h2>
+
+                                    <form onSubmit={handleSaveSettings}>
+                                        <div className="settings-section">
+                                            <h3>Company Information</h3>
+
+                                            <div className="form-group">
+                                                <label>Company Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={settingsName}
+                                                    onChange={(e) => setSettingsName(e.target.value)}
+                                                    placeholder="Your Company"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={company?.email}
+                                                    disabled
+                                                    style={{ opacity: 0.5 }}
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>API Key</label>
+                                                <div className="api-key-display">
+                                                    <div className="api-key-value">
+                                                        {apiKeyRevealed ? company?.api_key : '••••••••••••••••••••••'}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        className="copy-btn"
+                                                        onClick={() => {
+                                                            if (!apiKeyRevealed) setApiKeyRevealed(true);
+                                                            copyToClipboard(company?.api_key);
+                                                        }}
+                                                    >
+                                                        {apiKeyRevealed ? 'Copy' : 'Reveal'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="settings-section">
+                                            <h3>Email Integration</h3>
+                                            <div className="form-group">
+                                                <label>n8n Webhook URL</label>
+                                                <input
+                                                    type="text"
+                                                    value={n8nWebhook}
+                                                    onChange={(e) => setN8nWebhook(e.target.value)}
+                                                    placeholder="https://your-n8n-instance.app.n8n.cloud/webhook/..."
+                                                />
+                                            </div>
+                                            <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '8px' }}>
+                                                Optional: Add your n8n webhook URL to enable email reports from the copilot
+                                            </p>
+                                        </div>
+
+                                        <button type="submit" className="submit-btn" style={{ width: '100%' }}>
+                                            Save Settings
+                                        </button>
+                                    </form>
+
+                                    <div className="settings-section">
+                                        <h3>Usage Statistics</h3>
+                                        <div className="stats-grid">
+                                            <div className="stat-card">
+                                                <div className="stat-value">{stats.files}</div>
+                                                <div className="stat-label">Files Uploaded</div>
+                                            </div>
+                                            <div className="stat-card">
+                                                <div className="stat-value">{stats.messages}</div>
+                                                <div className="stat-label">Messages Sent</div>
+                                            </div>
+                                            <div className="stat-card">
+                                                <div className="stat-value">{stats.data_rows.toLocaleString()}</div>
+                                                <div className="stat-label">Data Rows</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {view === 'docs' && (
+                                <div className="docs-container">
+                                    <h2 style={{ marginBottom: '24px' }}>API Documentation</h2>
+
+                                    <div className="docs-section">
+                                        <h3>Authentication</h3>
+                                        <p className="docs-text">
+                                            All API requests require a Bearer token in the Authorization header:
+                                        </p>
+                                        <div className="code-block">
+Authorization: Bearer YOUR_JWT_TOKEN
+                                        </div>
+                                        <p className="docs-text" style={{ marginTop: '12px' }}>
+                                            Or use your API key:
+                                        </p>
+                                        <div className="code-block">
+X-API-Key: plx_your_api_key_here
+                                        </div>
+                                    </div>
+
+                                    <div className="docs-section">
+                                        <h3>Endpoints</h3>
+                                        <h4>POST /api/chat</h4>
+                                        <p className="docs-text">Send a message to the PharmaLogix copilot</p>
+                                        <div className="code-block">
+{`{
+  "message": "What are our KPIs this quarter?"
+}`}
+                                        </div>
+
+                                        <h4>POST /api/files/upload</h4>
+                                        <p className="docs-text">Upload a logistics data file (multipart/form-data)</p>
+
+                                        <h4>GET /api/files</h4>
+                                        <p className="docs-text">List all uploaded files</p>
+
+                                        <h4>POST /api/email/send</h4>
+                                        <p className="docs-text">Send an email via your n8n webhook</p>
+                                    </div>
+
+                                    <div className="docs-section">
+                                        <h3>Example: Python</h3>
+                                        <div className="code-block">
+{`import requests
+
+headers = {
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+response = requests.post(
+    "https://your-app.com/api/chat",
+    json={"message": "Analyze Q1 data"},
+    headers=headers
+)
+print(response.json())`}
+                                        </div>
+                                    </div>
+
+                                    <div className="docs-section">
+                                        <h3>Example: cURL</h3>
+                                        <div className="code-block">
+{`curl -X POST https://your-app.com/api/chat \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"message":"What is OTIF performance?"}'`}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {error && <div className="toast error">{error}</div>}
+                    {success && <div className="toast success">{success}</div>}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<PharmaLogixApp />);
+    </script>
+</body>
+</html>
